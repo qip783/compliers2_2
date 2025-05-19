@@ -98,7 +98,7 @@ using utils::nl;
 
 %type <Expr *> program;
 %type <Expr *> intExpr;
-
+%type <Expr *> ifExpr;
 
 %type <boost::optional<Symbol>> typeannotation;
 
@@ -127,6 +127,16 @@ decl: varDecl { $$ = $1; }
 intExpr: INT {$$ = new ast::types::IntegerLiteral(@1, $1); };
 
 
+ifExpr: IF expr THEN expr ELSE expr {
+	$$ = new ast::types::IfThenElse(@1, $2, $4, $6);
+};
+
+ifExpr: IF expr THEN expr {
+	$$ = new ast::types::IfThenElse(@1, $2, $4, new ast::types::Sequence(nl, std::vector<Expr*>()));
+};
+
+
+
 
 
 
@@ -143,6 +153,7 @@ expr: stringExpr { $$ = $1; }
    | breakExpr { $$ = $1; }
    | letExpr { $$ = $1; }
    | intExpr { $$ = $1; }
+   | ifExpr { $$ = $1; }
 ;
 
 varDecl: VAR ID typeannotation ASSIGN expr
